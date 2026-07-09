@@ -5,7 +5,6 @@ import {
   incrementQuantity,
   decrementQuantity,
   removeFromCart,
-  clearCart,
 } from "../features/cart/CartSlice";
 import "./CartItem.css";
 

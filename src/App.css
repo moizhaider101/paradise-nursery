@@ -15,12 +15,12 @@ body {
 
 /* Landing Page Styles */
 .landing-page {
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("./assets/nursery-background.jpg");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                    url('./assets/nursery-background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #27ae60;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
