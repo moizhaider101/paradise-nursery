@@ -1,0 +1,938 @@
+I'll guide you through each task for building the Paradise Nursery e-commerce application. Let me break down each step with code examples:
+
+## **Task 1: README.md File**
+
+Create a README.md file in your project root:
+
+```markdown
+# Paradise Nursery
+
+A modern e-commerce platform for purchasing plants and houseplants.
+
+## Features
+- Browse plants by category
+- Add items to shopping cart
+- Manage cart quantities
+- Responsive design
+
+## Technologies Used
+- React
+- Redux Toolkit
+- React Router
+- CSS3
+```
+
+---
+
+## **Task 2: AboutUs.jsx Component**
+
+```jsx
+import React from 'react';
+import './AboutUs.css';
+
+const AboutUs = () => {
+  return (
+    <div className="about-us-container">
+      <h1>About Paradise Nursery</h1>
+      <div className="about-content">
+        <p>
+          Welcome to Paradise Nursery, your premier destination for high-quality 
+          plants and houseplants. We are passionate about bringing nature into your home.
+        </p>
+        <p>
+          Founded in 2020, we have been committed to providing our customers with 
+          the finest selection of plants, expert advice, and exceptional service.
+        </p>
+        <p>
+          Our mission is to make gardening and plant care accessible to everyone, 
+          whether you're a seasoned gardener or just starting your green journey.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default AboutUs;
+```
+
+---
+
+## **Task 3: App.css with Background Image**
+
+```css
+/* App.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* Landing Page Styles */
+.landing-page {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                    url('./assets/nursery-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+}
+
+.company-name {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tagline {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.get-started-btn {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.get-started-btn:hover {
+  background-color: #45a049;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #2c3e50;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  color: white;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: #4CAF50;
+}
+
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  min-width: 18px;
+  text-align: center;
+}
+```
+
+**Note:** Place your background image in `src/assets/nursery-background.jpg`
+
+---
+
+## **Task 4: App.jsx with Landing Page**
+
+```jsx
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import './App.css';
+import AboutUs from './components/AboutUs';
+import ProductList from './components/ProductList';
+import CartItem from './components/CartItem';
+
+function App() {
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const LandingPage = () => (
+    <div className="landing-page">
+      <h1 className="company-name">Paradise Nursery</h1>
+      <p className="tagline">Bring Nature Home</p>
+      <Link to="/plants">
+        <button className="get-started-btn">Get Started</button>
+      </Link>
+    </div>
+  );
+
+  const Navbar = () => (
+    <nav className="navbar">
+      <Link to="/" className="navbar-brand">Paradise Nursery</Link>
+      <div className="navbar-links">
+        <Link to="/">Home</Link>
+        <Link to="/plants">Plants</Link>
+        <Link to="/about">About Us</Link>
+        <Link to="/cart" className="cart-icon">
+          🛒 Cart
+          {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
+        </Link>
+      </div>
+    </nav>
+  );
+
+  return (
+    <Router>
+      <div className="app">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/plants" element={
+            <>
+              <Navbar />
+              <ProductList />
+            </>
+          } />
+          <Route path="/cart" element={
+            <>
+              <Navbar />
+              <CartItem />
+            </>
+          } />
+          <Route path="/about" element={
+            <>
+              <Navbar />
+              <AboutUs />
+            </>
+          } />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+```
+
+---
+
+## **Task 5: CartSlice.jsx (Redux Slice)**
+
+```jsx
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  items: [],
+  totalQuantity: 0,
+  totalCost: 0,
+};
+
+const cartSlice = createSlice({
+  name: 'cart',
+  initialState,
+  reducers: {
+    addToCart: (state, action) => {
+      const existingItem = state.items.find(item => item.id === action.payload.id);
+      
+      if (existingItem) {
+        existingItem.quantity += 1;
+        existingItem.totalPrice = existingItem.quantity * existingItem.price;
+      } else {
+        state.items.push({
+          ...action.payload,
+          quantity: 1,
+          totalPrice: action.payload.price,
+        });
+      }
+      
+      state.totalQuantity += 1;
+      state.totalCost += action.payload.price;
+    },
+    
+    removeFromCart: (state, action) => {
+      const itemToRemove = state.items.find(item => item.id === action.payload);
+      if (itemToRemove) {
+        state.totalQuantity -= itemToRemove.quantity;
+        state.totalCost -= itemToRemove.totalPrice;
+        state.items = state.items.filter(item => item.id !== action.payload);
+      }
+    },
+    
+    incrementQuantity: (state, action) => {
+      const item = state.items.find(item => item.id === action.payload);
+      if (item) {
+        item.quantity += 1;
+        item.totalPrice = item.quantity * item.price;
+        state.totalQuantity += 1;
+        state.totalCost += item.price;
+      }
+    },
+    
+    decrementQuantity: (state, action) => {
+      const item = state.items.find(item => item.id === action.payload);
+      if (item && item.quantity > 1) {
+        item.quantity -= 1;
+        item.totalPrice = item.quantity * item.price;
+        state.totalQuantity -= 1;
+        state.totalCost -= item.price;
+      } else if (item && item.quantity === 1) {
+        state.totalQuantity -= 1;
+        state.totalCost -= item.totalPrice;
+        state.items = state.items.filter(i => i.id !== action.payload);
+      }
+    },
+    
+    clearCart: (state) => {
+      state.items = [];
+      state.totalQuantity = 0;
+      state.totalCost = 0;
+    },
+  },
+});
+
+export const { 
+  addToCart, 
+  removeFromCart, 
+  incrementQuantity, 
+  decrementQuantity, 
+  clearCart 
+} = cartSlice.actions;
+
+export default cartSlice.reducer;
+```
+
+**Store Configuration (src/app/store.js):**
+
+```jsx
+import { configureStore } from '@reduxjs/toolkit';
+import cartReducer from '../features/cart/CartSlice';
+
+export const store = configureStore({
+  reducer: {
+    cart: cartReducer,
+  },
+});
+```
+
+---
+
+## **Task 6: ProductList.jsx**
+
+```jsx
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../features/cart/CartSlice';
+import './ProductList.css';
+
+const ProductList = () => {
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
+  const [addedProducts, setAddedProducts] = useState({});
+
+  // Plant data organized by categories
+  const plantsByCategory = {
+    'Indoor Plants': [
+      { id: 1, name: 'Snake Plant', price: 25.99, category: 'Indoor Plants', thumbnail: '/images/snake-plant.jpg' },
+      { id: 2, name: 'Pothos', price: 15.99, category: 'Indoor Plants', thumbnail: '/images/pothos.jpg' },
+      { id: 3, name: 'Spider Plant', price: 18.99, category: 'Indoor Plants', thumbnail: '/images/spider-plant.jpg' },
+      { id: 4, name: 'Peace Lily', price: 22.99, category: 'Indoor Plants', thumbnail: '/images/peace-lily.jpg' },
+      { id: 5, name: 'Rubber Plant', price: 28.99, category: 'Indoor Plants', thumbnail: '/images/rubber-plant.jpg' },
+      { id: 6, name: 'Fiddle Leaf Fig', price: 45.99, category: 'Indoor Plants', thumbnail: '/images/fiddle-leaf.jpg' },
+    ],
+    'Succulents': [
+      { id: 7, name: 'Echeveria', price: 12.99, category: 'Succulents', thumbnail: '/images/echeveria.jpg' },
+      { id: 8, name: 'Jade Plant', price: 16.99, category: 'Succulents', thumbnail: '/images/jade-plant.jpg' },
+      { id: 9, name: 'Aloe Vera', price: 14.99, category: 'Succulents', thumbnail: '/images/aloe-vera.jpg' },
+      { id: 10, name: 'String of Pearls', price: 13.99, category: 'Succulents', thumbnail: '/images/string-pearls.jpg' },
+      { id: 11, name: 'Haworthia', price: 11.99, category: 'Succulents', thumbnail: '/images/haworthia.jpg' },
+      { id: 12, name: 'Sedum', price: 10.99, category: 'Succulents', thumbnail: '/images/sedum.jpg' },
+    ],
+    'Flowering Plants': [
+      { id: 13, name: 'Orchid', price: 35.99, category: 'Flowering Plants', thumbnail: '/images/orchid.jpg' },
+      { id: 14, name: 'African Violet', price: 19.99, category: 'Flowering Plants', thumbnail: '/images/african-violet.jpg' },
+      { id: 15, name: 'Anthurium', price: 29.99, category: 'Flowering Plants', thumbnail: '/images/anthurium.jpg' },
+      { id: 16, name: 'Begonia', price: 17.99, category: 'Flowering Plants', thumbnail: '/images/begonia.jpg' },
+      { id: 17, name: 'Gardenia', price: 24.99, category: 'Flowering Plants', thumbnail: '/images/gardenia.jpg' },
+      { id: 18, name: 'Hibiscus', price: 21.99, category: 'Flowering Plants', thumbnail: '/images/hibiscus.jpg' },
+    ],
+  };
+
+  const handleAddToCart = (plant) => {
+    dispatch(addToCart(plant));
+    setAddedProducts(prev => ({
+      ...prev,
+      [plant.id]: true
+    }));
+    
+    // Reset button after 2 seconds
+    setTimeout(() => {
+      setAddedProducts(prev => ({
+        ...prev,
+        [plant.id]: false
+      }));
+    }, 2000);
+  };
+
+  const isInCart = (productId) => {
+    return cartItems.some(item => item.id === productId);
+  };
+
+  return (
+    <div className="product-list-container">
+      <h1 className="page-title">Our Plants</h1>
+      
+      {Object.entries(plantsByCategory).map(([category, plants]) => (
+        <div key={category} className="category-section">
+          <h2 className="category-title">{category}</h2>
+          <div className="products-grid">
+            {plants.map((plant) => (
+              <div key={plant.id} className="product-card">
+                <div className="product-thumbnail">
+                  <img src={plant.thumbnail} alt={plant.name} />
+                </div>
+                <div className="product-info">
+                  <h3 className="product-name">{plant.name}</h3>
+                  <p className="product-price">${plant.price.toFixed(2)}</p>
+                  <button
+                    className={`add-to-cart-btn ${isInCart(plant.id) || addedProducts[plant.id] ? 'added' : ''}`}
+                    onClick={() => handleAddToCart(plant)}
+                    disabled={isInCart(plant.id) || addedProducts[plant.id]}
+                  >
+                    {isInCart(plant.id) || addedProducts[plant.id] 
+                      ? 'Added to Cart ✓' 
+                      : 'Add to Cart'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default ProductList;
+```
+
+**ProductList.css:**
+
+```css
+.product-list-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.category-section {
+  margin-bottom: 3rem;
+}
+
+.category-title {
+  font-size: 2rem;
+  color: #27ae60;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #27ae60;
+  padding-bottom: 0.5rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.product-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-thumbnail {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.product-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.product-name {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.product-price {
+  font-size: 1.5rem;
+  color: #27ae60;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-to-cart-btn:hover:not(:disabled) {
+  background-color: #229954;
+}
+
+.add-to-cart-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.add-to-cart-btn.added {
+  background-color: #27ae60;
+}
+```
+
+---
+
+## **Task 7: CartItem.jsx (Shopping Cart Page)**
+
+```jsx
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { 
+  incrementQuantity, 
+  decrementQuantity, 
+  removeFromCart,
+  clearCart 
+} from '../features/cart/CartSlice';
+import './CartItem.css';
+
+const CartItem = () => {
+  const dispatch = useDispatch();
+  const { items, totalCost } = useSelector((state) => state.cart);
+
+  const handleIncrement = (id) => {
+    dispatch(incrementQuantity(id));
+  };
+
+  const handleDecrement = (id) => {
+    dispatch(decrementQuantity(id));
+  };
+
+  const handleRemove = (id) => {
+    dispatch(removeFromCart(id));
+  };
+
+  const handleCheckout = () => {
+    alert('Checkout coming soon!');
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="empty-cart-container">
+        <h1>Shopping Cart</h1>
+        <p className="empty-cart-message">Your cart is empty</p>
+        <Link to="/plants" className="continue-shopping-btn">
+          Continue Shopping
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="cart-container">
+      <h1 className="cart-title">Shopping Cart</h1>
+      
+      <div className="cart-items">
+        {items.map((item) => (
+          <div key={item.id} className="cart-item">
+            <div className="cart-item-thumbnail">
+              <img src={item.thumbnail} alt={item.name} />
+            </div>
+            
+            <div className="cart-item-details">
+              <h3 className="cart-item-name">{item.name}</h3>
+              <p className="cart-item-price">Unit Price: ${item.price.toFixed(2)}</p>
+            </div>
+            
+            <div className="cart-item-quantity">
+              <button 
+                className="quantity-btn"
+                onClick={() => handleDecrement(item.id)}
+              >
+                -
+              </button>
+              <span className="quantity-value">{item.quantity}</span>
+              <button 
+                className="quantity-btn"
+                onClick={() => handleIncrement(item.id)}
+              >
+                +
+              </button>
+            </div>
+            
+            <div className="cart-item-total">
+              <p className="item-total-price">
+                Total: ${(item.price * item.quantity).toFixed(2)}
+              </p>
+            </div>
+            
+            <button 
+              className="delete-btn"
+              onClick={() => handleRemove(item.id)}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
+      
+      <div className="cart-summary">
+        <div className="summary-row">
+          <span>Total Items:</span>
+          <span>{items.reduce((total, item) => total + item.quantity, 0)}</span>
+        </div>
+        <div className="summary-row total">
+          <span>Total Cost:</span>
+          <span>${totalCost.toFixed(2)}</span>
+        </div>
+        
+        <div className="cart-actions">
+          <Link to="/plants" className="continue-shopping-btn">
+            Continue Shopping
+          </Link>
+          <button className="checkout-btn" onClick={handleCheckout}>
+            Checkout - Coming Soon
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CartItem;
+```
+
+**CartItem.css:**
+
+```css
+.cart-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.cart-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.empty-cart-container {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-cart-message {
+  font-size: 1.5rem;
+  color: #7f8c8d;
+  margin-bottom: 2rem;
+}
+
+.cart-items {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 100px 1fr auto auto auto;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-thumbnail {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cart-item-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item-name {
+  font-size: 1.25rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.cart-item-price {
+  color: #7f8c8d;
+}
+
+.cart-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantity-btn {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #bdc3c7;
+  background: white;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.quantity-btn:hover {
+  background: #ecf0f1;
+}
+
+.quantity-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
+
+.item-total-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.delete-btn {
+  padding: 0.5rem 1rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.cart-summary {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  font-size: 1.2rem;
+}
+
+.summary-row.total {
+  border-top: 2px solid #2c3e50;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.continue-shopping-btn,
+.checkout-btn {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.continue-shopping-btn {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.continue-shopping-btn:hover {
+  background-color: #7f8c8d;
+}
+
+.checkout-btn {
+  background-color: #27ae60;
+  color: white;
+}
+
+.checkout-btn:hover {
+  background-color: #229954;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cart-item {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .cart-item-thumbnail {
+    margin: 0 auto;
+  }
+  
+  .cart-actions {
+    flex-direction: column;
+  }
+}
+```
+
+---
+
+## **Project Setup Instructions:**
+
+1. **Create React App:**
+```bash
+npx create-react-app paradise-nursery
+cd paradise-nursery
+```
+
+2. **Install Dependencies:**
+```bash
+npm install @reduxjs/toolkit react-redux react-router-dom
+```
+
+3. **Create Folder Structure:**
+```
+src/
+  ├── app/
+  │   └── store.js
+  ├── components/
+  │   ├── AboutUs.jsx
+  │   ├── AboutUs.css
+  │   ├── ProductList.jsx
+  │   ├── ProductList.css
+  │   ├── CartItem.jsx
+  │   └── CartItem.css
+  ├── features/
+  │   └── cart/
+  │       └── CartSlice.jsx
+  ├── assets/
+  │   └── nursery-background.jpg
+  ├── App.js
+  ├── App.css
+  └── index.js
+```
+
+4. **Update index.js:**
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+```
+
+5. **Create GitHub Repository:**
+```bash
+git init
+git add .
+git commit -m "Initial commit - Paradise Nursery"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/paradise-nursery.git
+git push -u origin main
+```
+
+**Important Notes:**
+- Replace placeholder image paths with actual images
+- Test all functionality thoroughly
+- Make sure all routes work correctly
+- Verify cart functionality (add, remove, increment, decrement)
+- Ensure responsive design works on mobile devices
+
